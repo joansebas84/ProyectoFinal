@@ -7,17 +7,45 @@ import co.edu.poli.agro.modelo.Producto;
 import co.edu.poli.agro.servicios.OperacionArchivo;
 import co.edu.poli.agro.servicios.OperacionCRUD;
 
+/**
+ * Clase que implementa las operaciones CRUD y de persistencia en archivo
+ * para la gestión de productos agrícolas.
+ * <p>
+ * Los productos se almacenan en un arreglo dinámico que se duplica automáticamente
+ * cuando alcanza su capacidad máxima. La persistencia se realiza en el archivo
+ * {@code productos.txt} con un formato delimitado por el carácter {@code |}.
+ * </p>
+ *
+ * @author Joan Florez - Mateo Paredes
+ * @version 1.0
+ * @since 22/05/2026
+ * @see OperacionCRUD
+ * @see OperacionArchivo
+ */
 public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArchivo {
 
+    /** Arreglo dinámico que almacena los productos registrados en el sistema. */
     private Producto[] ArreglooObjetos;
+
+    /** Número de productos actualmente registrados en el arreglo. */
     private int contador;
 
+    /**
+     * Constructor que inicializa el arreglo con capacidad inicial de 2
+     * y el contador en cero.
+     */
     public ImplementacionOperacionCRUD() {
         this.ArreglooObjetos = new Producto[2];
         this.contador = 0;
     }
 
-    // ─── Duplica el arreglo cuando se llena ──────────────────────────────────
+    /**
+     * Duplica la capacidad del arreglo interno cuando este se encuentra lleno.
+     * <p>
+     * Crea un nuevo arreglo con el doble de capacidad, copia los elementos
+     * existentes y reemplaza el arreglo original.
+     * </p>
+     */
     private void duplicarArreglo() {
         Producto[] nuevoArreglo = new Producto[ArreglooObjetos.length * 2];
         for (int i = 0; i < ArreglooObjetos.length; i++) {
@@ -29,6 +57,16 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
 
     // ─── OperacionCRUD ───────────────────────────────────────────────────────
 
+    /**
+     * Registra un nuevo producto en el sistema.
+     * <p>
+     * Si el arreglo está lleno, se duplica su capacidad antes de insertar.
+     * Asigna automáticamente un ID secuencial al producto.
+     * </p>
+     *
+     * @param producto el objeto {@link Producto} a registrar
+     * @return mensaje con el resultado de la operación e ID asignado
+     */
     @Override
     public String crear(Producto producto) {
         if (contador == ArreglooObjetos.length) {
@@ -40,6 +78,12 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
         return "Producto registrado correctamente con ID: " + producto.getId();
     }
 
+    /**
+     * Recupera el producto ubicado en la posición indicada del arreglo interno.
+     *
+     * @param indice la posición del producto en el arreglo (base 0)
+     * @return el {@link Producto} en la posición indicada, o {@code null} si el índice es inválido
+     */
     @Override
     public Producto leer(int indice) {
         if (indice < 0 || indice >= contador) {
@@ -49,6 +93,11 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
         return ArreglooObjetos[indice];
     }
 
+    /**
+     * Recupera todos los productos actualmente registrados en el sistema.
+     *
+     * @return arreglo con todos los productos registrados; arreglo vacío si no hay ninguno
+     */
     @Override
     public Producto[] leertodo() {
         Producto[] resultado = new Producto[contador];
@@ -58,6 +107,13 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
         return resultado;
     }
 
+    /**
+     * Modifica el producto ubicado en la posición indicada, conservando su ID original.
+     *
+     * @param indice   la posición del producto a modificar (base 0)
+     * @param producto el nuevo objeto {@link Producto} con los datos actualizados
+     * @return mensaje indicando el resultado de la operación
+     */
     @Override
     public String modificar(int indice, Producto producto) {
         if (indice < 0 || indice >= contador) {
@@ -68,6 +124,13 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
         return "Producto en posicion " + indice + " modificado correctamente.";
     }
 
+    /**
+     * Elimina el producto ubicado en la posición indicada y desplaza los elementos
+     * posteriores hacia atrás para mantener la continuidad del arreglo.
+     *
+     * @param indice la posición del producto a eliminar (base 0)
+     * @return mensaje indicando el resultado de la operación
+     */
     @Override
     public String eliminar(int indice) {
         if (indice < 0 || indice >= contador) {
@@ -83,8 +146,18 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
 
     // ─── OperacionArchivo ────────────────────────────────────────────────────
 
+    /** Nombre del archivo de texto donde se persisten los datos. */
     private static final String ARCHIVO = "productos.txt";
 
+    /**
+     * Serializa todos los productos registrados y los guarda en el archivo
+     * {@code productos.txt}, sobreescribiendo cualquier contenido previo.
+     * <p>
+     * Formato por línea: {@code TIPO|id|nombre|cantidad|unidad|fecha|[campos específicos]}
+     * </p>
+     *
+     * @return mensaje indicando si el guardado fue exitoso o si ocurrió un error
+     */
     @Override
     public String serializar() {
         try {
@@ -119,6 +192,15 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
         }
     }
 
+    /**
+     * Deserializa los productos almacenados en el archivo {@code productos.txt}
+     * y los carga en el arreglo interno, reemplazando los datos actuales.
+     * <p>
+     * Las líneas vacías son ignoradas. Si el archivo no existe, retorna un arreglo vacío.
+     * </p>
+     *
+     * @return arreglo con los productos cargados; arreglo vacío si el archivo no existe o hay error
+     */
     @Override
     public Producto[] desereralizar() {
         java.io.File archivo = new java.io.File(ARCHIVO);
@@ -173,6 +255,17 @@ public class ImplementacionOperacionCRUD implements OperacionCRUD, OperacionArch
 
     // ─── Getters utilitarios ─────────────────────────────────────────────────
 
+    /**
+     * Retorna el número de productos actualmente registrados en el sistema.
+     *
+     * @return el conteo de productos registrados
+     */
     public int getContador() { return contador; }
+
+    /**
+     * Retorna la capacidad actual del arreglo interno de productos.
+     *
+     * @return la capacidad máxima actual del arreglo
+     */
     public int getCapacidad() { return ArreglooObjetos.length; }
 }

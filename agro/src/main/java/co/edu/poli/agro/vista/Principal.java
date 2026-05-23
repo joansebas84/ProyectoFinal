@@ -8,11 +8,38 @@ import co.edu.poli.agro.servicios.ImplementacionOperacionCRUD;
 
 import java.util.Scanner;
 
+/**
+ * Clase principal de la interfaz por consola del sistema de gestión de productos agrícolas.
+ * <p>
+ * Presenta un menú interactivo en la terminal que permite realizar las operaciones
+ * CRUD sobre los productos: registrar, consultar, modificar y eliminar, así como
+ * guardar y cargar datos desde el archivo {@code productos.txt}.
+ * Sirve como punto de entrada alternativo cuando no se usa la interfaz gráfica JavaFX.
+ * </p>
+ *
+ * @author Joan Florez - Mateo Paredes
+ * @version 1.0
+ * @since 22/05/2026
+ * @see ImplementacionOperacionCRUD
+ */
 public class Principal {
 
+    /** Objeto Scanner para leer la entrada del usuario desde la consola. */
     static Scanner sc = new Scanner(System.in);
+
+    /** Instancia de la implementación CRUD y de archivo para gestionar los productos. */
     static ImplementacionOperacionCRUD impl = new ImplementacionOperacionCRUD();
 
+    /**
+     * Método principal que inicia la aplicación de consola.
+     * <p>
+     * Carga automáticamente los datos del archivo {@code productos.txt} si existe,
+     * y presenta el menú principal en bucle hasta que el usuario elija salir (opción 0).
+     * Maneja excepciones de entrada para evitar cierres inesperados.
+     * </p>
+     *
+     * @param args argumentos de línea de comandos (no utilizados)
+     */
     public static void main(String[] args) {
 
         java.io.File archivo = new java.io.File("productos.txt");
@@ -44,7 +71,7 @@ public class Principal {
 
                 if (opcion < 0 || opcion > 7) {
                     System.out.println("Esa opcion no es valida, por favor escoja una opcion valida (0 - 7).");
-                    opcion = -1; // fuerza que el do-while repita
+                    opcion = -1;
                     continue;
                 }
 
@@ -72,11 +99,17 @@ public class Principal {
         } while (opcion != 0);
     }
 
-    // ─── 1. Registrar ────────────────────────────────────────────────────────
+    /**
+     * Solicita al usuario los datos para registrar un nuevo producto agrícola.
+     * <p>
+     * Pide el tipo (Fertilizante, Pesticida o Abono) y luego los campos comunes
+     * y específicos del tipo elegido. Valida que la cantidad y los días (para Abono)
+     * sean valores numéricos positivos.
+     * </p>
+     */
     static void registrar() {
         int tipo = -1;
 
-        // Bucle hasta que el usuario elija un tipo válido
         do {
             try {
                 System.out.println("\n-- Tipo de producto --");
@@ -103,7 +136,6 @@ public class Principal {
             String nombre = sc.nextLine();
 
             double cantidad = -1;
-            // Bucle hasta que cantidad sea válida
             do {
                 try {
                     System.out.print("Cantidad disponible: ");
@@ -148,7 +180,6 @@ public class Principal {
                     System.out.print("Origen: ");
                     String origen = sc.nextLine();
                     int dias = -1;
-                    // Bucle hasta que dias sea válido
                     do {
                         try {
                             System.out.print("Tiempo de descomposicion (dias): ");
@@ -179,7 +210,11 @@ public class Principal {
         }
     }
 
-    // ─── 2. Ver uno ──────────────────────────────────────────────────────────
+    /**
+     * Solicita un índice y muestra la información del producto correspondiente.
+     * Valida que el índice sea un entero dentro del rango de registros actuales.
+     * Si no hay productos registrados, informa al usuario y retorna sin solicitar entrada.
+     */
     static void verUno() {
         if (impl.getContador() == 0) {
             System.out.println("No hay productos registrados.");
@@ -213,7 +248,11 @@ public class Principal {
         }
     }
 
-    // ─── 3. Ver todos ────────────────────────────────────────────────────────
+    /**
+     * Muestra en consola la lista completa de todos los productos registrados.
+     * Cada producto se presenta precedido de su índice en el arreglo interno.
+     * Si no hay productos, informa al usuario y retorna sin imprimir.
+     */
     static void verTodos() {
         try {
             Producto[] lista = impl.leertodo();
@@ -230,7 +269,14 @@ public class Principal {
         }
     }
 
-    // ─── 4. Modificar ────────────────────────────────────────────────────────
+    /**
+     * Permite modificar un producto existente seleccionado por índice.
+     * <p>
+     * Muestra la lista antes de solicitar el índice. Para cada campo,
+     * si el usuario deja la entrada vacía se conserva el valor actual.
+     * Valida cantidad y días de descomposición (Abono) como valores positivos.
+     * </p>
+     */
     static void modificar() {
         if (impl.getContador() == 0) {
             System.out.println("No hay productos registrados.");
@@ -360,7 +406,12 @@ public class Principal {
         }
     }
 
-    // ─── 5. Eliminar ─────────────────────────────────────────────────────────
+    /**
+     * Permite eliminar un producto existente seleccionado por índice.
+     * Muestra la lista antes de pedir el índice y valida que sea un entero
+     * dentro del rango de registros actuales.
+     * Si no hay productos, informa al usuario y retorna sin solicitar entrada.
+     */
     static void eliminar() {
         if (impl.getContador() == 0) {
             System.out.println("No hay productos registrados.");
@@ -393,7 +444,10 @@ public class Principal {
         }
     }
 
-    // ─── 6. Serializar ───────────────────────────────────────────────────────
+    /**
+     * Guarda todos los productos en el archivo {@code productos.txt}.
+     * Muestra un mensaje de error si ocurre una excepción durante el guardado.
+     */
     static void serializar() {
         try {
             System.out.println(impl.serializar());
@@ -402,7 +456,10 @@ public class Principal {
         }
     }
 
-    // ─── 7. Deserializar ─────────────────────────────────────────────────────
+    /**
+     * Carga los productos desde el archivo {@code productos.txt} y los muestra en consola.
+     * Si el archivo no existe o está vacío, informa al usuario y retorna sin modificar el estado.
+     */
     static void deserializar() {
         try {
             Producto[] lista = impl.desereralizar();

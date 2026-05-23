@@ -1,0 +1,2 @@
+PESTICIDA|2|nutrimon-p|60.0|Kg|26/06/2026|ratas|Alta|mantener fuera del alcanze de los niños
+PESTICIDA|3|glifosato|600.0|L|26/06/2026|Plantas Malignas|Alta|mantener fuera del alcanze de los niños
